@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f5fa">
+
+    <title>{% block title %}CarePath{% endblock %}</title>
+
+    <meta name="description" content="{% block description %}CarePath — Where data becomes care.{% endblock %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    {% block header %}
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('main.home') }}">
+            <span class="logo"></span>
+            carepath
+        </a>
+
+        <nav class="nav-links">
+            <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+            <a class="nav-link" href="{{ url_for('main.home') }}#platform">Workspace</a>
+            <a class="nav-link" href="{{ url_for('main.home') }}#trust">Security</a>
+        </nav>
+
+        <div class="header-actions">
+            {% if current_user.is_authenticated %}
+                <a class="login-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                <a class="btn btn-grad" href="{{ url_for('main.logout') }}">Log out</a>
+            {% else %}
+                <a class="login-link" href="{{ url_for('main.login') }}">Log in</a>
+                <a class="btn btn-grad" href="{{ url_for('main.register') }}">Get started</a>
+            {% endif %}
+        </div>
+    </header>
+    {% endblock %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="site-footer">
+        <a class="brand" href="{{ url_for('main.home') }}">
+            <span class="logo"></span>
+            carepath
+        </a>
+
+        <span>© 2026 CarePath</span>
+
+        <a href="{{ url_for('main.home') }}">Back to home</a>
+    </footer>
+    {% endblock %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

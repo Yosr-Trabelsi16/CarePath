@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ req.title }} — CarePath{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set step = {'Pending': 1, 'Accepted': 2, 'Completed': 3}.get(req.status, 1) %}
+
+<section class="d-page">
+<div class="d-wrap d-narrow">
+
+    <a class="d-back" href="{{ url_for('main.dashboard') }}">← Back to dashboard</a>
+
+    <div style="height: 20px"></div>
+    {% include "_flash.html" %}
+
+    <div class="d-detail">
+        <div class="d-detail-top">
+            <span class="d-pill st-{{ req.status|lower }}">{{ req.status }}</span>
+            <span>{{ req.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+        </div>
+
+        <h1>{{ req.title }}</h1>
+
+        <div class="d-journey">
+            {% for n, label in [(1, 'Sent'), (2, 'Accepted'), (3, 'Completed')] %}
+            <div class="d-node {{ 'on' if n <= step }} {{ 'cur' if n == step }}">
+                <i>{{ '✓' if n < step or (n == step and step == 3) else n }}</i>
+                {{ label }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="d-cols">
+
+        <div class="d-box">
+            <h2>Description</h2>
+            <div class="d-desc">{{ req.description }}</div>
+        </div>
+
+        <div class="d-box">
+            <h2>Care team</h2>
+
+            <div class="d-person">
+                <span class="d-av">{{ req.patient.full_name[:1]|upper }}</span>
+                <div><small>Patient</small><strong>{{ req.patient.full_name }}</strong></div>
+            </div>
+
+            <div class="d-person">
+                {% if req.provider %}
+                    <span class="d-av">{{ req.provider.full_name[:1]|upper }}</span>
+                    <div><small>Provider</small><strong>Dr. {{ req.provider.full_name }}</strong></div>
+                {% else %}
+                    <span class="d-av off">?</span>
+                    <div><small>Provider</small><strong>Not assigned yet</strong></div>
+                {% endif %}
+            </div>
+
+            <div class="d-hr"></div>
+            <h2 style="margin-top: 20px">Appointment</h2>
+
+            {% if appointment %}
+                <div class="d-appt-box">
+                    <div class="d-date">
+                        <b>{{ appointment.scheduled_at.strftime('%d') }}</b>
+                        <span>{{ appointment.scheduled_at.strftime('%b') }}</span>
+                    </div>
+                    <div>
+                        <strong>{{ appointment.scheduled_at.strftime('%A') }}</strong>
+                        <small>{{ appointment.scheduled_at.strftime('%H:%M') }} · {{ appointment.scheduled_at.strftime('%Y') }}</small>
+                    </div>
+                </div>
+            {% else %}
+                <p class="d-hint" style="color: var(--grey)">
+                    {% if req.status == "Pending" %}Available once a provider accepts your request.
+                    {% elif req.status == "Accepted" %}No appointment scheduled yet.
+                    {% else %}No appointment.{% endif %}
+                </p>
+            {% endif %}
+
+            {% if current_user.role == "provider" and req.status == "Accepted" and req.provider_id == current_user.id %}
+                <form method="POST" action="{{ url_for('main.schedule_appointment', request_id=req.id) }}" class="d-appt-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <label for="scheduled_at">{{ "Reschedule" if appointment else "Pick a date and time" }}</label>
+                    <input type="datetime-local" id="scheduled_at" name="scheduled_at" min="{{ now_min }}" required>
+                    <button type="submit" class="btn btn-grad">{{ "Reschedule" if appointment else "Schedule appointment" }}</button>
+                </form>
+            {% endif %}
+
+            {% if current_user.role == "provider" %}
+                <div class="d-actions">
+                {% if req.status == "Pending" %}
+                    <form method="POST" action="{{ url_for('main.accept_request', request_id=req.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-grad">Accept this request</button>
+                    </form>
+                {% elif req.status == "Accepted" and req.provider_id == current_user.id %}
+                    <form method="POST" action="{{ url_for('main.complete_request', request_id=req.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-ghost">Mark as completed</button>
+                    </form>
+                {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="d-sec">
+        <h2>Activity</h2>
+    </div>
+    <ul class="d-timeline">
+        {% for l in logs %}
+            <li>
+                <strong>{{ l.action }}</strong>
+                <small>{{ l.created_at.strftime('%d %b %Y, %H:%M') }}</small>
+            </li>
+        {% else %}
+            <li><small>No activity yet.</small></li>
+        {% endfor %}
+    </ul>
+
+</div>
+</section>
+{% endblock %}

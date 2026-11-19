@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — CarePath{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{# One request card. show_patient=True -> footer shows the patient (provider view) #}
+{% macro card(r, show_patient=False) %}
+{% set step = {'Pending': 1, 'Accepted': 2, 'Completed': 3}.get(r.status, 1) %}
+<a class="d-req s-{{ r.status|lower }}" href="{{ url_for('main.request_detail', request_id=r.id) }}">
+    <div class="d-req-top">
+        <span class="d-pill st-{{ r.status|lower }}">{{ r.status }}</span>
+        <small>{{ r.created_at.strftime('%d %b %Y') }}</small>
+    </div>
+
+    <h3>{{ r.title }}</h3>
+    <p>{{ r.description }}</p>
+
+    <div class="d-prog">
+        <div class="d-bar"><i style="width: {{ [33, 66, 100][step - 1] }}%"></i></div>
+        <div class="d-steps">
+            <span class="{{ 'on' if step >= 1 }}">Sent</span>
+            <span class="{{ 'on' if step >= 2 }}">Accepted</span>
+            <span class="{{ 'on' if step >= 3 }}">Completed</span>
+        </div>
+    </div>
+
+    <div class="d-req-foot">
+        {% if show_patient %}
+            <span class="d-av">{{ r.patient.full_name[:1]|upper }}</span>
+            <span>{{ r.patient.full_name }}</span>
+        {% elif r.provider %}
+            <span class="d-av">{{ r.provider.full_name[:1]|upper }}</span>
+            <span>Dr. {{ r.provider.full_name }}</span>
+        {% else %}
+            <span class="d-av off">?</span>
+            <span class="muted">Waiting for a provider</span>
+        {% endif %}
+        <b class="d-go">→</b>
+    </div>
+</a>
+{% endmacro %}
+
+{% set is_patient = current_user.role == "patient" %}
+{% set in_progress = mine|selectattr('status', 'equalto', 'Accepted')|list %}
+{% set done = mine|selectattr('status', 'equalto', 'Completed')|list %}
+{% set pending = mine|selectattr('status', 'equalto', 'Pending')|list %}
+
+<section class="d-page">
+<div class="d-wrap">
+
+    {% include "_flash.html" %}
+
+    <div class="d-banner d-dark">
+
+        <div class="d-banner-top">
+            <span class="d-eyebrow"><i></i>{{ "PATIENT SPACE" if is_patient else "PROVIDER SPACE" }}</span>
+            {% if is_patient %}
+                <a class="btn btn-white" href="{{ url_for('main.new_request') }}">+ New request</a>
+            {% endif %}
+        </div>
+
+        <h1>Hello,<br><em>{{ current_user.full_name.split(' ')[0] }}.</em></h1>
+        <p>
+            {% if is_patient %}Your requests and care updates, all in one place.
+            {% else %}Pick up new requests and follow the ones you are handling.{% endif %}
+        </p>
+
+        <svg class="d-ecg" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true">
+            <path class="base" pathLength="100" d="M0 30H90L100 30 112 8 126 52 138 30H250L262 24 274 30H390L400 30 412 8 426 52 438 30H600"/>
+            <path class="run"  pathLength="100" d="M0 30H90L100 30 112 8 126 52 138 30H250L262 24 274 30H390L400 30 412 8 426 52 438 30H600"/>
+        </svg>
+
+        <div class="d-chips">
+            {% if is_patient %}
+                <div class="d-chip"><b>{{ mine|length }}</b><span>Total requests</span></div>
+                <div class="d-chip"><b>{{ pending|length }}</b><span>Waiting for a provider</span></div>
+                <div class="d-chip"><b>{{ done|length }}</b><span>Completed</span></div>
+            {% else %}
+                <div class="d-chip"><b>{{ open_requests|length }}</b><span>Open requests</span></div>
+                <div class="d-chip"><b>{{ in_progress|length }}</b><span>In progress</span></div>
+                <div class="d-chip"><b>{{ done|length }}</b><span>Completed</span></div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if upcoming %}
+        <div class="d-sec">
+            <h2>Upcoming appointments <span class="d-count">{{ upcoming|length }}</span></h2>
+        </div>
+        <div class="d-appts">
+            {% for a in upcoming %}
+            <a class="d-appt" href="{{ url_for('main.request_detail', request_id=a.request_id) }}">
+                <div class="d-date">
+                    <b>{{ a.scheduled_at.strftime('%d') }}</b>
+                    <span>{{ a.scheduled_at.strftime('%b') }}</span>
+                </div>
+                <div class="d-appt-main">
+                    <strong>{{ a.request.title }}</strong>
+                    <small>
+                        {{ a.scheduled_at.strftime('%A · %H:%M') }} ·
+                        {% if is_patient %}Dr. {{ a.provider.full_name }}{% else %}{{ a.patient.full_name }}{% endif %}
+                    </small>
+                </div>
+                <b class="d-go">→</b>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if is_patient %}
+
+        <div class="d-sec">
+            <h2>My requests <span class="d-count">{{ mine|length }}</span></h2>
+        </div>
+
+        {% if mine %}
+            <div class="d-grid">
+                {% for r in mine %}{{ card(r) }}{% endfor %}
+            </div>
+        {% else %}
+            <div class="d-empty">
+                <span class="d-ico">+</span>
+                <h3>Start your care journey</h3>
+                <p>Send your first request and a healthcare provider will pick it up.</p>
+                <a class="btn btn-grad" href="{{ url_for('main.new_request') }}">Create a request</a>
+            </div>
+        {% endif %}
+
+    {% else %}
+
+        <div class="d-board">
+
+            <div class="d-col">
+                <div class="d-col-head">
+                    <span><i style="background: var(--pink)"></i>Open</span>
+                    <span class="d-count">{{ open_requests|length }}</span>
+                </div>
+                {% for r in open_requests %}{{ card(r, show_patient=True) }}
+                {% else %}<div class="d-col-empty">All caught up. New requests appear here.</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-col">
+                <div class="d-col-head">
+                    <span><i style="background: var(--violet)"></i>In progress</span>
+                    <span class="d-count">{{ in_progress|length }}</span>
+                </div>
+                {% for r in in_progress %}{{ card(r, show_patient=True) }}
+                {% else %}<div class="d-col-empty">Requests you accept will show here.</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-col">
+                <div class="d-col-head">
+                    <span><i style="background: #35c27a"></i>Completed</span>
+                    <span class="d-count">{{ done|length }}</span>
+                </div>
+                {% for r in done %}{{ card(r, show_patient=True) }}
+                {% else %}<div class="d-col-empty">Nothing completed yet.</div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+</section>
+
+{% endblock %}

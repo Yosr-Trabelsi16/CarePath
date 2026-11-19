@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}New request — CarePath{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="d-page">
+<div class="d-wrap d-narrow">
+
+    <a class="d-back" href="{{ url_for('main.dashboard') }}">← Back to dashboard</a>
+
+    <div class="d-pagehead">
+        <h1>New <em>request.</em></h1>
+        <p>Tell us what you need. A healthcare provider will pick it up and follow it with you.</p>
+    </div>
+
+    {% include "_flash.html" %}
+
+    <div class="d-split">
+
+        <aside class="d-tips d-dark">
+            <h3>How it works</h3>
+
+            <div class="d-tip">
+                <b>1</b>
+                <div><strong>Describe it</strong><span>Symptoms, duration, anything useful.</span></div>
+            </div>
+            <div class="d-tip">
+                <b>2</b>
+                <div><strong>A provider accepts</strong><span>You see who is handling your request.</span></div>
+            </div>
+            <div class="d-tip">
+                <b>3</b>
+                <div><strong>Follow every update</strong><span>Status and activity, in one timeline.</span></div>
+            </div>
+        </aside>
+
+        <div class="d-card">
+            <form method="POST" action="{{ url_for('main.new_request') }}" class="d-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="d-field">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" maxlength="150"
+                           placeholder="e.g. Persistent headache for 3 days"
+                           value="{{ form_title }}" required>
+                </div>
+
+                <div class="d-field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"
+                              placeholder="What are you feeling? Since when? Any treatment already tried?" required>{{ form_description }}</textarea>
+                    <small class="d-hint">The more detail you give, the faster you get a useful answer.</small>
+                </div>
+
+                <button type="submit" class="btn btn-grad">Send request →</button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+</section>
+{% endblock %}

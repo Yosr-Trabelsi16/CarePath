@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f5fa">
+<meta name="description" content="CarePath unifies requests, appointments, lab results and imaging in one interoperable, secure health record.">
+<title>CarePath — Where data becomes care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="loader" id="pageLoader"><svg viewBox="0 0 200 40"><path d="M0 20H60L68 20 76 6 86 36 94 20H130L138 16 146 20H200"/></svg></div>
+
+<header class="site-header" id="navbar">
+  <a class="brand" href="#home"><span class="logo"></span>carepath</a>
+  <nav class="nav-links" id="navLinks">
+    <a class="nav-link" href="#home">Overview</a>
+    <a class="nav-link" href="#platform">Workspace</a>
+    <a class="nav-link" href="#signals">Clinical signals</a>
+    <a class="nav-link" href="#journey">Care flow</a>
+    <a class="nav-link" href="#trust">Security</a>
+  </nav>
+  <div class="header-actions">
+    <a class="login-link" href="/login">Log in</a>
+    <a class="btn btn-grad" href="/register">Open my space</a>
+  </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span></button>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-copy">
+      <h1>Where data<br>becomes <em>care.</em></h1>
+      <p>Requests, appointments, lab results and imaging, unified in one interoperable health record. Live, secure and finally understandable.</p>
+      <div class="hero-actions">
+        <a class="btn btn-grad" href="/register">Create my space</a>
+        <a class="btn btn-ghost" href="#platform">Explore the workspace</a>
+      </div>
+    </div>
+    <div class="chip c1"><i class="dot"></i><b><span id="bpm">72</span> bpm</b><small>ECG · sinus rhythm</small></div>
+    <div class="chip c2"><b>HbA1c 5.4 %</b><small>LOINC 4548-4 · normal</small></div>
+    <div class="chip c3"><b>MRI · 2 new images</b><small>DICOM · received 09:42</small></div>
+    <div class="chip c4"><b>FHIR R4 synced</b><small>Clinic ↔ Lab ↔ Pharmacy</small></div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div><span>HL7 FHIR R4</span><span>DICOM</span><span>SNOMED CT</span><span>LOINC</span><span>ICD-10</span><span>OAuth 2.0</span><span>AES-256</span><span>GDPR</span><span>HL7 FHIR R4</span><span>DICOM</span><span>SNOMED CT</span><span>LOINC</span><span>ICD-10</span><span>OAuth 2.0</span><span>AES-256</span><span>GDPR</span></div></div>
+
+  <section class="stats">
+    <div><b data-count="12">0</b><span>clinical data sources in one record</span></div>
+    <div><b data-count="1" data-prefix="&lt; " data-suffix=" s">0</b><span>to sync a new result</span></div>
+    <div><b data-count="256" data-suffix="-bit">0</b><span>encryption on every file</span></div>
+  </section>
+
+  <section class="console section" id="platform">
+    <h2>One workspace.<br>Every stream of your care.</h2>
+    <div class="console-box">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="requests" role="tab">Requests</button>
+        <button class="tab" data-tab="appointments" role="tab">Appointments</button>
+        <button class="tab" data-tab="documents" role="tab">Records</button>
+      </div>
+      <div class="panel" id="panel" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="signals section" id="signals">
+    <h2>Numbers that tell you<br>what they mean.</h2>
+    <div class="sig-grid">
+      <div class="card">
+        <small>Glucose · last 30 days</small>
+        <svg viewBox="0 0 400 140" class="chart"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ec6fa8"/><stop offset="1" stop-color="#7c5cff"/></linearGradient><linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c5cff" stop-opacity=".25"/><stop offset="1" stop-color="#7c5cff" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 100C40 90 60 40 100 60S160 110 200 70 270 30 310 55 370 80 400 45V140H0Z" fill="url(#f)"/><path class="line" d="M0 100C40 90 60 40 100 60S160 110 200 70 270 30 310 55 370 80 400 45" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" pathLength="1"/><circle class="pt" cx="400" cy="45" r="6"/></svg>
+        <p>Stable for 3 weeks. Within your target range.</p>
+      </div>
+      <div class="card gauge">
+        <small>Care risk index</small>
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" class="trk"/><circle cx="60" cy="60" r="50" class="arc" pathLength="100"/></svg>
+        <b class="gv">12</b><p>Low. No action needed.</p>
+      </div>
+      <div class="card list">
+        <small>Care team signals</small>
+        <div class="sg"><i class="ok"></i>Lab results reviewed by Dr. Ben Salah</div>
+        <div class="sg"><i class="wa"></i>Cardiology referral awaiting approval</div>
+        <div class="sg"><i class="ok"></i>Prescription synced with pharmacy</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow section" id="journey">
+    <h2>From first request<br>to resolved.</h2>
+    <div class="flow-track" id="flowTrack">
+      <div class="flow-line"><i id="flowFill"></i></div>
+      <article class="flow-step"><h3>Create your space</h3><p>Sign up once. Your overview opens with everything in place.</p></article>
+      <article class="flow-step"><h3>Send, schedule, upload</h3><p>Requests, visits and documents land on one timeline.</p></article>
+      <article class="flow-step"><h3>Follow every update</h3><p>See who is reviewing, what changed and what comes next.</p></article>
+    </div>
+  </section>
+
+  <section class="trust section" id="trust">
+    <h2>Medical data deserves<br>serious protection.</h2>
+    <ul>
+      <li><b>Encrypted end to end</b><span>In transit and at rest. Unreadable to anyone without access.</span></li>
+      <li><b>You hold the keys</b><span>Only you and your assigned care team can open your record.</span></li>
+      <li><b>Every access is logged</b><span>See who viewed what and when, at any time.</span></li>
+    </ul>
+  </section>
+
+  <section class="closing">
+    <h2>Your health,<br>in high definition.</h2>
+    <a class="btn btn-white btn-big" id="magnet" href="/register">Create my space</a>
+  </section>
+</main>
+
+<footer class="site-footer"><a class="brand" href="#home"><span class="logo"></span>carepath</a><span>© 2026 CarePath</span><a href="#home">Back to top</a></footer>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

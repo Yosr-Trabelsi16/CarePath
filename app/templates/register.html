@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — CarePath{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+
+<section class="auth-page">
+
+    <div class="auth-visual">
+        <div class="auth-orb orb-one"></div>
+        <div class="auth-orb orb-two"></div>
+
+        <a class="auth-brand" href="{{ url_for('main.home') }}">
+            <span class="logo"></span>
+            carepath
+        </a>
+
+        <div class="visual-content">
+            <span class="visual-tag">YOUR JOURNEY STARTS HERE</span>
+
+            <h1>A healthier journey<br>begins with <em>you.</em></h1>
+
+            <p>
+                Join CarePath and bring your health information,
+                appointments and care journey together.
+            </p>
+
+            <div class="visual-decoration">
+                <div class="pulse-circle">
+                    <span>✦</span>
+                </div>
+                <div class="pulse-line"></div>
+                <div class="pulse-info">
+                    <strong>Care made connected.</strong>
+                    <small>Everything important, in one place.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="visual-footer">
+            <span>CarePath © 2026</span>
+            <span>Where data becomes care.</span>
+        </div>
+    </div>
+
+    <div class="auth-form-side">
+
+        <div class="auth-top">
+            <span>Already have an account?</span>
+            <a href="{{ url_for('main.login') }}">Sign in ↗</a>
+        </div>
+
+        <div class="auth-form-container">
+
+            <div class="auth-heading">
+                <span class="auth-icon">✦</span>
+                <span class="welcome-label">CREATE YOUR ACCOUNT</span>
+
+                <h2>Your space.<br>Your care journey.</h2>
+
+                <p>Fill in your details to get started with CarePath.</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flash-messages">
+                  {% for message in messages %}
+                    <p class="flash">{{ message }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('main.register') }}" class="auth-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="full_name">Full name</label>
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="account_type">I want to join as</label>
+
+                    <select id="account_type" name="account_type" required>
+                        <option value="" disabled selected>Select account type</option>
+                        <option value="patient">Patient</option>
+                        <option value="provider">Healthcare provider</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button type="button" class="toggle-password" data-target="password">
+                            Show
+                        </button>
+                    </div>
+
+                    <small class="input-hint">Use at least 8 characters.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm password</label>
+
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Repeat your password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button type="button" class="toggle-password" data-target="confirm_password">
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <label class="remember-option">
+                    <input type="checkbox" name="terms" required>
+                    <span>I agree to the Terms of Service and Privacy Policy.</span>
+                </label>
+
+                <button type="submit" class="auth-submit">
+                    <span>Create my account</span>
+                    <span class="submit-arrow">→</span>
+                </button>
+
+            </form>
+
+            <div class="auth-divider">
+                <span>YOUR HEALTH, YOUR SPACE</span>
+            </div>
+
+            <p class="auth-switch">
+                Already part of CarePath?
+                <a href="{{ url_for('main.login') }}">Sign in</a>
+            </p>
+
+            <div class="auth-security">
+                <span>♢</span>
+                Your information deserves protection.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll(".toggle-password").forEach(button => {
+    button.addEventListener("click", function () {
+        const input = document.getElementById(this.dataset.target);
+
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+        this.textContent = isHidden ? "Hide" : "Show";
+    });
+});
+</script>
+{% endblock %}
