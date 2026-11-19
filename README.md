@@ -357,3 +357,17 @@ Developed as a software engineering project.
 ## License
 
 To be determined.
+
+## Screenshots
+
+### Home Page
+![Home Page](app/static/images/home.png)
+
+### Login
+![Login](app/static/images/login.png)
+
+### Dashboard
+![Dashboard](app/static/images/dashboard.png)
+
+### New Request
+![New Request](app/static/images/new-request.png)
